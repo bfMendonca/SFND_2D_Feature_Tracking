@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <deque>
 #include <vector>
 #include <cmath>
 #include <limits>
@@ -37,7 +38,10 @@ int main(int argc, const char *argv[])
 
     // misc
     int dataBufferSize = 2;       // no. of images which are held in memory (ring buffer) at the same time
-    vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+    deque<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+        //NOTE: Switched from vectr to queue to improve performance for implementing the ring buffer. Altough the performance
+        //for insertions should be similar to adding a new element, as vector are alligned in memory, all the data would need
+        //to be moved in order to remove the element at the end
     bool bVis = false;            // visualize results
 
     /* MAIN LOOP OVER ALL IMAGES */
@@ -59,10 +63,17 @@ int main(int argc, const char *argv[])
         //// STUDENT ASSIGNMENT
         //// TASK MP.1 -> replace the following code with ring buffer of size dataBufferSize
 
-        // push image into data frame buffer
-        DataFrame frame;
+         // push image into data frame buffer
+
+        dataBuffer.push_back(DataFrame()); // Let's avoid an unecessary copy on the copy constructor
+        while( dataBuffer.size() > dataBufferSize ) {
+            //We shouldn't be running this more than once per iterations, but....
+            dataBuffer.pop_front();
+        }
+        DataFrame &frame = dataBuffer.back();
         frame.cameraImg = imgGray;
-        dataBuffer.push_back(frame);
+
+        //cout << "Buffer size: " << dataBuffer.size() << endl;
 
         //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
