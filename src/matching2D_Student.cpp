@@ -90,6 +90,12 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
             extractor = cv::xfeatures2d::FREAK::create();
         }else if( descriptorType.compare("AKAZE") == 0 ) {
             extractor = cv::AKAZE::create();
+
+            //For some reason, we will need to set the class_id for usage in akaze
+            for( vector<cv::KeyPoint>::iterator it = keypoints.begin(); it != keypoints.end(); ++it ) {
+                (*it).class_id = 0;
+            }
+
         }else if( descriptorType.compare("SIFT") == 0 ) { 
             extractor = cv::xfeatures2d::SIFT::create();
         }
@@ -130,6 +136,7 @@ void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool
         cv::KeyPoint newKeyPoint;
         newKeyPoint.pt = cv::Point2f((*it).x, (*it).y);
         newKeyPoint.size = blockSize;
+        newKeyPoint.class_id = 0;
         keypoints.push_back(newKeyPoint);
     }
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
@@ -172,6 +179,7 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
         cv::KeyPoint newKeyPoint;
         newKeyPoint.pt = cv::Point2f((*it).x, (*it).y);
         newKeyPoint.size = blockSize;
+        newKeyPoint.class_id = 0;
         keypoints.push_back(newKeyPoint);
     }
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
